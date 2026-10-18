@@ -11,7 +11,7 @@
 ![Discord](https://img.shields.io/badge/delivers%20to-Discord-5865F2?logo=discord&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-[Install](#install) · [What's in it](#whats-in-it) · [Example](#example) · [A tool loop](#a-tool-loop) · [Configuration](#configuration) · [Notes](#notes)
+[Install](#install) · [Where it sits](#where-it-sits) · [What's in it](#whats-in-it) · [Example](#example) · [A tool loop](#a-tool-loop) · [Configuration](#configuration) · [Notes](#notes)
 
 </div>
 
@@ -30,6 +30,32 @@ npm install cron-llm zod
 ```
 
 [Zod](https://zod.dev) is a TypeScript library for describing the shape of data (`z.object({ gist: z.string() })`) and checking values against it, with the TypeScript type inferred from the same definition. cron-llm uses it for every answer it expects back: the schema is turned into JSON Schema for the model's `response_format`, and the reply is checked against it before your code sees it. Install it next to cron-llm for your own schemas; cron-llm uses zod 4.
+
+## Where it sits
+
+Three jobs are built on it, each the same shape: a job with the prompts and checks, cron-llm for the model, the MCP client and Discord, and one MCP server that owns the API and the state.
+
+```mermaid
+flowchart TB
+  subgraph jobs["Jobs (supercronic in Docker)"]
+    sd["substack-digest"]
+    md["medium-digest"]
+    sp["spotify-discovery"]
+  end
+  cl["cron-llm<br/>Llm · runLoop · McpServer · runJob"]
+  sd & md & sp --> cl
+  cl --> llm["LiteLLM → model"]
+  cl --> discord["Discord"]
+  sd -- "MCP stdio" --> sr["substack-reader-mcp"]
+  md -- "MCP stdio" --> mr["medium-reader-mcp"]
+  sp -- "MCP stdio" --> spm["spotify-discovery-mcp"]
+  sr & mr & spm --> libs["job-ledger (state, locks, runs)<br/>paced-fetch (API pacing)"]
+  sr --> substack["Substack"]
+  mr --> medium["Medium"]
+  spm --> spotify["Spotify"]
+```
+
+The MCP servers are plain MCP servers, usable from any agent host; they know nothing about cron-llm or the jobs. cron-llm knows nothing about any one job. Each job is the only place its prompts live: [substack-digest](https://github.com/wkbaran/substack-digest), [medium-digest](https://github.com/wkbaran/medium-digest), [spotify-discovery](https://github.com/wkbaran/spotify-discovery).
 
 ## What's in it
 
