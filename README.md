@@ -1,8 +1,21 @@
-# cron-llm
+<div align="center">
+
+# Cron LLM
+
+**The runtime for scheduled LLM jobs: a digest every morning, a playlist twice a week.**
 
 ![npm](https://img.shields.io/npm/v/cron-llm) ![Node 26+](https://img.shields.io/badge/node-26%2B-339933?logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![MCP](https://img.shields.io/badge/MCP-stdio%20client-6E56CF)
+![LLM](https://img.shields.io/badge/LLM-OpenAI--compatible-412991)
+![Discord](https://img.shields.io/badge/delivers%20to-Discord-5865F2?logo=discord&logoColor=white)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-The runtime for scheduled LLM jobs: a digest every morning, a playlist twice a week. The code does the work, and the model only judges.
+[Install](#install) · [What's in it](#whats-in-it) · [Example](#example) · [Configuration](#configuration) · [Notes](#notes)
+
+</div>
+
+The code does the work, and the model only judges.
 
 A job built on it is a plain Node script that supercronic (or any cron) starts. It drives MCP servers as child processes, asks the model narrow questions with a JSON schema, and posts the result to Discord. There's no agent framework in between, so there's no framework system prompt, no delegation layer, and no final message for the model to copy by hand. Everything the model sees is a prompt the job wrote.
 
