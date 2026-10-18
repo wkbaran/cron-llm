@@ -29,7 +29,7 @@ Published on npm as [cron-llm](https://www.npmjs.com/package/cron-llm):
 npm install cron-llm zod
 ```
 
-`zod` is for your own schemas; cron-llm uses zod 4.
+[Zod](https://zod.dev) is a TypeScript library for describing the shape of data (`z.object({ gist: z.string() })`) and checking values against it, with the TypeScript type inferred from the same definition. cron-llm uses it for every answer it expects back: the schema is turned into JSON Schema for the model's `response_format`, and the reply is checked against it before your code sees it. Install it next to cron-llm for your own schemas; cron-llm uses zod 4.
 
 ## What's in it
 
