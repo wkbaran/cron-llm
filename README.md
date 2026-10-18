@@ -52,8 +52,8 @@ flowchart TB
   md -- "MCP stdio" --> mr["medium-reader-mcp"]
   sp -- "MCP stdio" --> spm["spotify-discovery-mcp"]
   subgraph libs["Shared libraries"]
-    jl["job-ledger<br/>state, locks, runs"]
-    pf["paced-fetch<br/>API pacing"]
+    jl["job-ledger: state, locks, runs"]
+    pf["paced-fetch: API pacing"]
   end
   sr & mr & spm --> libs
   sr --> substack["Substack"]
