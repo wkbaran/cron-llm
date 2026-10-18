@@ -64,6 +64,12 @@ describe("runJob", () => {
     expect(sent).toEqual([{ url: "http://fail", body: { content: "⚠ digest failed: Medium session expired", allowed_mentions: { parse: [] } } }]);
   });
 
+  it("posts under the given username", async () => {
+    const { fetch, sent } = fakeFetch([() => new Response(null, { status: 204 })]);
+    await runJob("lane", async () => "report", { env: { DISCORD_WEBHOOK_URL: "http://hook" }, argv: [], fetch, write: () => {}, username: "Spotify · lane-a" });
+    expect(sent[0]!.body).toEqual({ content: "report", allowed_mentions: { parse: [] }, username: "Spotify · lane-a" });
+  });
+
   it("sends nothing when the job returns null", async () => {
     const { fetch, sent } = fakeFetch([() => new Response(null, { status: 204 })]);
     await runJob("digest", async () => null, { env: { DISCORD_WEBHOOK_URL: "http://hook" }, argv: [], fetch, write: () => {} });

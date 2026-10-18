@@ -1,6 +1,6 @@
 {
   "name": "cron-llm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Runtime for scheduled LLM jobs: structured calls through an OpenAI-compatible gateway, a bounded tool loop, MCP servers as child processes, and Discord delivery",
   "license": "MIT",
   "author": "Bill Baran",

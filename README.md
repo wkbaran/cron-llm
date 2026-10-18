@@ -39,7 +39,7 @@ npm install cron-llm zod
 | `loop` | `runLoop`: a bounded tool loop. Each tool has a budget that the code enforces: a spent tool is taken out of the tool list. The loop ends with one structured call that turns the tool log into your result schema |
 | `mcp` | `McpServer.start()`: an MCP server as a stdio child process with only the environment you give it. `call()` returns the tool's text and throws `McpToolError` on `isError`; `callStructured()` returns its `structuredContent`, checked with a zod schema. `asLoopTool()` hands one of its tools to the loop |
 | `discord` | `postDiscord`: a webhook post, split at line breaks under Discord's 2000-character cap, with mentions turned off |
-| `job` | `runJob(name, fn)`: the entry-point wrapper. Posts what the job returns, sends a short failure notice if it throws, sets the exit code, and supports `--dry-run` |
+| `job` | `runJob(name, fn)`: the entry-point wrapper. Posts what the job returns, sends a short failure notice if it throws, sets the exit code, and supports `--dry-run`. `runJob(name, fn, { username })` posts under a name of your choice |
 
 ## Example
 

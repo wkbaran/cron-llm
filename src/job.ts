@@ -25,6 +25,8 @@ export interface JobOptions {
   fetch?: typeof fetch;
   /** Where log lines go; stdout by default. */
   write?: (line: string) => void;
+  /** The name the posts appear under, instead of the webhook's own. Discord groups back-to-back posts from one name. */
+  username?: string;
 }
 
 export async function runJob(name: string, fn: (ctx: JobContext) => Promise<string | null | void>, opts: JobOptions = {}): Promise<number> {
@@ -46,7 +48,7 @@ export async function runJob(name: string, fn: (ctx: JobContext) => Promise<stri
     const detail = err instanceof Error ? err.message : String(err);
     log(`failed after ${elapsed()}: ${err instanceof Error && err.stack ? err.stack : detail}`);
     if (failureWebhook && !dryRun) {
-      await postDiscord(failureWebhook, `⚠ ${name} failed: ${detail.slice(0, 1500)}`, { fetch: opts.fetch }).catch((e: unknown) =>
+      await postDiscord(failureWebhook, `⚠ ${name} failed: ${detail.slice(0, 1500)}`, { fetch: opts.fetch, username: opts.username }).catch((e: unknown) =>
         log(`couldn't post the failure notice: ${e instanceof Error ? e.message : String(e)}`),
       );
     }
@@ -63,7 +65,7 @@ export async function runJob(name: string, fn: (ctx: JobContext) => Promise<stri
     return setExit(0);
   }
   try {
-    await postDiscord(webhook, message, { fetch: opts.fetch });
+    await postDiscord(webhook, message, { fetch: opts.fetch, username: opts.username });
   } catch (err) {
     log(`the message couldn't be posted: ${err instanceof Error ? err.message : String(err)}`);
     write(message);
