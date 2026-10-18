@@ -7,6 +7,14 @@ const server = new McpServer({ name: "echo", version: "1.0.0" });
 server.registerTool("echo", { description: "Echo", inputSchema: { text: z.string() } }, async ({ text }) => ({
   content: [{ type: "text", text: `${text} (${process.env.ECHO_SUFFIX ?? "no env"})` }],
 }));
+server.registerTool(
+  "count",
+  { description: "Count", inputSchema: { text: z.string() }, outputSchema: { words: z.number() } },
+  async ({ text }) => {
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return { content: [{ type: "text", text: `${words} words` }], structuredContent: { words } };
+  },
+);
 server.registerTool("fail", { description: "Fail", inputSchema: {} }, async () => ({ isError: true, content: [{ type: "text", text: "it broke" }] }));
 console.error("echo server ready");
 await server.connect(new StdioServerTransport());

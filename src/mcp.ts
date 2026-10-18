@@ -50,7 +50,7 @@ export class McpServer {
         for (const l of lines) if (l.trim()) opts.onStderr!(l);
       });
     }
-    const client = new Client({ name: "cron-llm", version: "0.1.0" });
+    const client = new Client({ name: "cron-llm", version: "0.2.0" });
     await client.connect(transport);
     return new McpServer(client, opts.timeoutMs ?? 900_000);
   }
@@ -61,6 +61,23 @@ export class McpServer {
 
   /** Call a tool and return its text. Throws McpToolError when the server reports an error. */
   async call(name: string, args: Record<string, unknown> = {}): Promise<string> {
+    return (await this.callTool(name, args)).text;
+  }
+
+  /**
+   * Call a tool that declares an output schema and return its
+   * `structuredContent`, checked against `schema`. Throws McpToolError when the
+   * server reports an error or sends no structured content.
+   */
+  async callStructured<T>(name: string, args: Record<string, unknown>, schema: z.ZodType<T>): Promise<{ value: T; text: string }> {
+    const { text, structured } = await this.callTool(name, args);
+    if (structured === undefined) throw new McpToolError(name, `${name} returned no structuredContent`);
+    const parsed = schema.safeParse(structured);
+    if (!parsed.success) throw new McpToolError(name, `${name} returned unexpected structuredContent: ${z.prettifyError(parsed.error)}`);
+    return { value: parsed.data, text };
+  }
+
+  private async callTool(name: string, args: Record<string, unknown>): Promise<{ text: string; structured?: unknown }> {
     const res = await this.client.callTool({ name, arguments: args }, undefined, { timeout: this.timeoutMs, resetTimeoutOnProgress: true });
     const content = (res.content ?? []) as { type: string; text?: string }[];
     const text = content
@@ -68,7 +85,7 @@ export class McpServer {
       .map((c) => c.text ?? "")
       .join("\n");
     if (res.isError) throw new McpToolError(name, text || `${name} failed`);
-    return text;
+    return { text, structured: res.structuredContent };
   }
 
   /**
