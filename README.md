@@ -11,7 +11,7 @@
 ![Discord](https://img.shields.io/badge/delivers%20to-Discord-5865F2?logo=discord&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
-[Install](#install) · [What's in it](#whats-in-it) · [Example](#example) · [Configuration](#configuration) · [Notes](#notes)
+[Install](#install) · [What's in it](#whats-in-it) · [Example](#example) · [A tool loop](#a-tool-loop) · [Configuration](#configuration) · [Notes](#notes)
 
 </div>
 
@@ -64,6 +64,44 @@ await runJob("substack-digest", async ({ log, dryRun }) => {
   }
 });
 ```
+
+### A tool loop
+
+`runLoop` is for the one step in a job that can't be a single question, such as researching on the web. It's independent of `runJob`; call it wherever the step is. The model calls tools until it answers in text, a budget runs out or the turn limit is reached. Budgets are the loop's, not the prompt's: a tool whose calls are spent is taken out of the model's tool list. One structured call then turns the log of tool calls into your result schema.
+
+```ts
+import { runLoop, tool } from "cron-llm";
+import { z } from "zod";
+
+const search = tool({
+  name: "web_search",
+  description: "Search the web. Returns titles, URLs and snippets.",
+  args: z.object({ query: z.string() }),
+  budget: 20,
+  run: async ({ query }) => searchWeb(query), // your function, returning text
+});
+
+// A tool from an MCP server, budgeted the same way.
+const verify = server.asLoopTool("verify_tracks", {
+  description: "Check found tracks on Spotify, one per line.",
+  args: z.object({ text: z.string() }),
+  budget: 8,
+});
+
+const { value, calls, stopped } = await runLoop({
+  llm,
+  system: "You research new music for one genre.",
+  user: "Find 6 to 12 recent tracks that fit … and hand them to verify_tracks.",
+  tools: [search, verify],
+  final: z.object({ summary: z.string() }),
+  finalPrompt: "Sum up the research in one or two sentences.",
+  maxTurns: 40,
+  log,
+});
+// stopped: "answered" | "budget" | "max_turns"; calls: every call with its result and whether it ran
+```
+
+Arguments are checked against each tool's zod schema before `run` is called. A call over budget, to an unknown tool or with bad arguments gets an error result the model can read, and isn't run. A tool that throws gives the model its error message, and the loop carries on.
 
 ## Configuration
 
