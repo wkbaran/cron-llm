@@ -40,6 +40,8 @@ export interface ChatOptions {
   temperature?: number;
   /** Added to the client's tags for this call only. */
   tags?: string[];
+  /** Extra body fields for this call only, over the client's `extra` (e.g. `{ reasoning_effort: "medium" }`). */
+  extra?: Record<string, unknown>;
 }
 
 export interface LlmOptions {
@@ -95,6 +97,7 @@ export class Llm {
       model: this.opts.model,
       messages,
       ...this.opts.extra,
+      ...opts.extra,
       metadata: { tags: [...(this.opts.tags ?? []), ...(opts.tags ?? [])] },
     };
     if (opts.tools?.length) body.tools = opts.tools;
@@ -128,7 +131,7 @@ export class Llm {
   async structured<S extends z.ZodType>(
     schema: S,
     prompt: { system?: string; user: string } | Message[],
-    opts: { name?: string; attempts?: number; maxTokens?: number; temperature?: number; tags?: string[] } = {},
+    opts: { name?: string; attempts?: number; maxTokens?: number; temperature?: number; tags?: string[]; extra?: Record<string, unknown> } = {},
   ): Promise<z.infer<S>> {
     const messages: Message[] = Array.isArray(prompt)
       ? [...prompt]
@@ -137,7 +140,7 @@ export class Llm {
     const attempts = opts.attempts ?? 2;
     let raw = "";
     for (let i = 1; ; i++) {
-      const { message } = await this.chat(messages, { responseFormat, maxTokens: opts.maxTokens, temperature: opts.temperature, tags: opts.tags });
+      const { message } = await this.chat(messages, { responseFormat, maxTokens: opts.maxTokens, temperature: opts.temperature, tags: opts.tags, extra: opts.extra });
       raw = message.content ?? "";
       const problem = check(schema, raw);
       if (problem.ok) return problem.value;

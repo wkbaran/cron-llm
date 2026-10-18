@@ -20,6 +20,12 @@ describe("Llm.chat", () => {
     expect(client.usage).toEqual({ prompt_tokens: 10, completion_tokens: 5, calls: 1 });
   });
 
+  it("lets one call override the client's extra fields", async () => {
+    const { fetch, sent } = fakeFetch([() => completion({ content: '{"gist":"g","depth":1}' })]);
+    await llm(fetch, { extra: { reasoning_effort: "none" } }).structured(Gist, { system: "s", user: "u" }, { extra: { reasoning_effort: "medium" } });
+    expect(sent[0]!.body.reasoning_effort).toBe("medium");
+  });
+
   it("retries a 5xx, then gives up with the status", async () => {
     const ok = fakeFetch([() => json({ error: "busy" }, 503, { "retry-after": "0" }), () => completion({ content: "ok" })]);
     expect((await llm(ok.fetch).chat([{ role: "user", content: "x" }])).message.content).toBe("ok");
