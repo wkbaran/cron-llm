@@ -42,16 +42,20 @@ flowchart TB
     md["medium-digest"]
     sp["spotify-discovery"]
   end
-  cl["`**cron-llm**
-Llm · runLoop · McpServer · runJob`"]
-  sd & md & sp --> cl
+  subgraph cl["cron-llm"]
+    cp["Llm · runLoop · McpServer · runJob"]
+  end
+  jobs --> cl
   cl --> llm["LiteLLM → model"]
   cl --> discord["Discord"]
   sd -- "MCP stdio" --> sr["substack-reader-mcp"]
   md -- "MCP stdio" --> mr["medium-reader-mcp"]
   sp -- "MCP stdio" --> spm["spotify-discovery-mcp"]
-  sr & mr & spm --> libs["`**job-ledger** state, locks, runs
-**paced-fetch** API pacing`"]
+  subgraph libs["Shared libraries"]
+    jl["job-ledger<br/>state, locks, runs"]
+    pf["paced-fetch<br/>API pacing"]
+  end
+  sr & mr & spm --> libs
   sr --> substack["Substack"]
   mr --> medium["Medium"]
   spm --> spotify["Spotify"]
