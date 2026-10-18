@@ -2,7 +2,7 @@
 
 # Cron LLM
 
-**The runtime for scheduled LLM jobs: a digest every morning, a playlist twice a week.**
+**The runtime for scheduled LLM jobs: a digest every morning, a playlist every day.**
 
 ![npm](https://img.shields.io/npm/v/cron-llm) ![Node 26+](https://img.shields.io/badge/node-26%2B-339933?logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
