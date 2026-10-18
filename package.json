@@ -1,0 +1,49 @@
+{
+  "name": "cron-llm",
+  "version": "0.1.0",
+  "description": "Runtime for scheduled LLM jobs: structured calls through an OpenAI-compatible gateway, a bounded tool loop, MCP servers as child processes, and Discord delivery",
+  "license": "MIT",
+  "author": "Bill Baran",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wkbaran/cron-llm.git"
+  },
+  "keywords": [
+    "llm",
+    "cron",
+    "mcp",
+    "litellm",
+    "agent",
+    "structured-output"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}
