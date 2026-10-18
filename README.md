@@ -1,10 +1,22 @@
 # cron-llm
 
+![npm](https://img.shields.io/npm/v/cron-llm) ![Node 26+](https://img.shields.io/badge/node-26%2B-339933?logo=nodedotjs&logoColor=white)
+
 The runtime for scheduled LLM jobs: a digest every morning, a playlist twice a week. The code does the work, and the model only judges.
 
 A job built on it is a plain Node script that supercronic (or any cron) starts. It drives MCP servers as child processes, asks the model narrow questions with a JSON schema, and posts the result to Discord. There's no agent framework in between, so there's no framework system prompt, no delegation layer, and no final message for the model to copy by hand. Everything the model sees is a prompt the job wrote.
 
 It came out of moving [Hermes Agent](https://github.com/NousResearch/hermes-agent) cron jobs onto their own containers, after most of their failures turned out to come from the agent layer, not from the jobs.
+
+## Install
+
+Published on npm as [cron-llm](https://www.npmjs.com/package/cron-llm):
+
+```sh
+npm install cron-llm zod
+```
+
+`zod` is for your own schemas; cron-llm uses zod 4.
 
 ## What's in it
 
